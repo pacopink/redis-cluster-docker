@@ -1,4 +1,4 @@
-Use docker to build a redis cluster with 6 instances for testing 
+Use docker to build a redis cluster with 6 instances for testing
 The 6 instances are divided into 3 shards, 1 master- 1 slave per shard,
 so that HA can be achived.
 ```
@@ -69,7 +69,7 @@ OK
 % docker start redis-node0
 redis-node0
 ```
-### after it start up, it takes the slave role, use cluster failover to regain master role
+### after it starts up, it takes the slave role, use cluster failover to regain master role
 ```
 127.0.0.1:7010> ROLE
 1) "slave"
@@ -94,7 +94,7 @@ OK
 4) "connected"
 5) (integer) 422
 ```
-### the key-value we set before is not lost, the that is how the HA works, enjoy it.
+### the key-value we set before is not lost, that is how the HA works, enjoy it.
 ```
 127.0.0.1:7011> get aa
 -> Redirected to slot [1180] located at 127.0.0.1:7010
@@ -102,3 +102,7 @@ OK
 127.0.0.1:7010> get aa
 "value"
 ```
+
+## ONE MORE THING
+Consider the way that we put the 6 nodes into 2 shard, 1 master - 2 slaves, will we get better availability then 3 shards mode?
+TRY IT and see what happend, it is fragile, while any master out-of-service, the remaining 1 master cannot form a quorum to promote slaves of other shard to master, so it lost.
