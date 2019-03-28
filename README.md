@@ -1,3 +1,5 @@
+###ATTENTON: In this branch, add password 'ericsdad' to all redis instances, so you need to add '-a ericsdad' in redis-cli
+
 Use docker to build a redis cluster with 6 instances for testing 
 The 6 instances are divided into 3 shards, 1 master- 1 slave per shard,
 so that HA can be achived.

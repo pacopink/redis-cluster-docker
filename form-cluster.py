@@ -5,6 +5,8 @@ import sys
 import traceback
 import time
 
+db = 0
+auth = 'ericsdad'
 nodes = [
         "127.0.0.1:7010",
         "127.0.0.1:7011",
@@ -25,14 +27,20 @@ if num%replicate_group_node_num != 0:
     print "total node number cannot be divided by replicate_group_node_num evenly"
     sys.exit(1)
 
-
 def host(str):
     v = str.split(":")
-    return (v[0], int(v[1]))
+    return [v[0], int(v[1])]
+
+def host_port_db_auth(str):
+    l = host(str)
+    l.append(db)
+    l.append(auth)
+    return l
+
 
 def meetup():
     '''meet up nodes and collect node ids'''
-    r = redis.Redis(*host(nodes[0]))
+    r = redis.Redis(*host_port_db_auth(nodes[0]))
     for node in nodes[1:]:
         r.cluster("meet", *host(node))
 
@@ -55,7 +63,7 @@ def replicate():
         master = pair[0]
         slave = pair[1]
         masters.append(master)
-        r = redis.Redis(*host(slave))
+        r = redis.Redis(*host_port_db_auth(slave))
         while True:
             try:
                 # it is chance that failed to get cluster, need to retry
@@ -75,12 +83,12 @@ def assign_slots_by_range():
     for i in range(0, num):
         start_slot = i*per_node
         end_slot = i*per_node+per_node
-        r = redis.Redis(*host(masters[i]))
+        r = redis.Redis(*host_port_db_auth(masters[i]))
         r.cluster("addslots", *range(start_slot, end_slot))
 
     odd_slots = TOTAL_SLOTS-per_node*num
     if odd_slots>0:
-        r = redis.Redis(*host(masters[num-1]))
+        r = redis.Redis(*host_port_db_auth(masters[num-1]))
         r.cluster("addslots", *range(per_node*num, per_node*num+odd_slots))
     
 if __name__=="__main__":
@@ -89,6 +97,7 @@ if __name__=="__main__":
     try:
         assign_slots_by_range()
     except Exception,e:
+        traceback.print_exc()
         print "Encouter exception: ", e
         print "seems you already formed a cluster"
 
