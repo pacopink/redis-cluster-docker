@@ -18,7 +18,7 @@ so that HA can be achived.
 
 run build.sh to build a customized docker image named : redis-cluster
 
-## Step 2: run 6 docker containers from image 'redis-clsuter'
+## Step 2: run 6 docker containers from image 'redis-cluster'
 
 run 'docker-run-nodes.sh', then you will get 6 independent docker containers of redis instance, 
 named redis-node[0-5] which listens to localhost:701[0-5]
